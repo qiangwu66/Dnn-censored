@@ -67,7 +67,7 @@ One major advantage of Gaussian quadrature is that if the integrand \(f(x)\) is 
 Gaussian quadrature is typically applied on the standard interval \([-1, 1]\). The formula for this case is:
 
 $$
-\int_{-1}^1 f(x) \, dx \approx \sum_{i=1}^n w_i f(x_i)
+\int_{-1}^1 f(x) dx \approx \sum_{i=1}^n w_i f(x_i)
 $$
 
 #### 2. Transforming to a General Interval
