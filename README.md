@@ -49,7 +49,7 @@ Gaussian quadrature is a numerical integration method used to compute definite i
 The goal of Gaussian quadrature is to approximate the definite integral by carefully choosing specific points (called **Gaussian nodes**) in the integration interval and associated weights. The formula is:
 
 $$
-\int_a^b f(x) \, dx \approx \sum_{i=1}^n w_i f(x_i)
+\int_a^b f(x) dx \approx \sum_{i=1}^n w_i f(x_i)
 $$
 
 Where:
