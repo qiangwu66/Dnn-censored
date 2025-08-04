@@ -80,7 +80,7 @@ $$
 The integral becomes:
 
 $$
-\int_a^b f(x) dx = \frac{b-a}{2} \int_{-1}^1 f\left(\frac{b-a}{2} \xi + \frac{b+a}{2}\right) d\xi
+\int_a^b f(x) dx = \frac{b-a}{2} \int_{-1}^1 f\left(\frac{b-a}{2} \xi + \frac{b+a}{2}\right) d\xi \approx \frac{b-a}{2} \sum_{i=1}^n w_i f\left(\frac{b-a}{2} \xi_i + \frac{b+a}{2}\right)
 $$
 
 Then Gaussian quadrature can be applied on the transformed integral.
