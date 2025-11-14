@@ -98,7 +98,7 @@ For various values of \(n\), the nodes and weights can be computed numerically o
 
 ---
 
-### Example Code
+### Example 1 Code
 
 Below is an example implementation of Gaussian quadrature in Python:
 
@@ -117,7 +117,6 @@ def gaussian_quadrature(func, a, b, n):
     integral = np.sum(transformed_weights * func(t))
     return integral
 
-### Example 1: Compute ∫_0^1 (x^2) dx
 result = gaussian_quadrature(lambda x: x**2, 0, 1, 3)
 print(f"Integral result: {result}")
 
@@ -190,8 +189,6 @@ def adaptive_gaussian_quadrature(func, a, b, n_low=32, n_high=64, tol=1e-5, max_
 f = lambda x: x**2
 res = adaptive_gaussian_quadrature(f, 0.0, 1.0, n_low=32, n_high=64, tol=1e-10, max_depth=20)
 print("Integral result:", res)
-print("True value     :", 1.0/3.0)
-print("Abs error      :", abs(res - 1.0/3.0))
 
 ```
 
