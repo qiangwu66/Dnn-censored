@@ -117,7 +117,7 @@ def gaussian_quadrature(func, a, b, n):
     integral = np.sum(transformed_weights * func(t))
     return integral
 
-### Example: Compute ∫_0^1 (x^2) dx
+### Example 1: Compute ∫_0^1 (x^2) dx
 result = gaussian_quadrature(lambda x: x**2, 0, 1, 3)
 print(f"Integral result: {result}")
 
@@ -147,7 +147,53 @@ Local error $\le$ tolerance (absolute and/or relative).
 Reaching a maximum recursion depth or a minimum interval size (to avoid infinite subdivision).
 
 
+### Example 2 Code
 
+Below is an example implementation of adaptive Gaussian quadrature in Python:
+
+```python
+
+
+import numpy as np
+
+def quad_once(func, a, b, nodes_low, weights_low, nodes_high, weights_high):
+    mid = 0.5 * (a + b)
+    half = 0.5 * (b - a)
+    t_low = mid + half * nodes_low
+    t_high = mid + half * nodes_high
+    f_low = func(t_low)
+    f_high = func(t_high)
+    I_low = half * np.sum(weights_low * f_low)
+    I_high = half * np.sum(weights_high * f_high)
+    return I_low, I_high, abs(I_high - I_low)
+
+def adaptive_gaussian_quadrature(func, a, b, n_low=32, n_high=64, tol=1e-5, max_depth=20):
+    x_low, w_low = np.polynomial.legendre.leggauss(n_low)
+    x_high, w_high = np.polynomial.legendre.leggauss(n_high)
+
+    total = 0.0
+    stack = [(a, b, 0)]  # (left, right, depth)
+
+    while stack:
+        left, right, depth = stack.pop()
+        I_low, I_high, err = quad_once(func, left, right, x_low, w_low, x_high, w_high)
+
+        if err <= tol or depth >= max_depth:
+            total += I_high
+        else:
+            mid = 0.5 * (left + right)
+            stack.append((mid, right, depth + 1))
+            stack.append((left, mid, depth + 1))
+
+    return total
+
+f = lambda x: x**2
+res = adaptive_gaussian_quadrature(f, 0.0, 1.0, n_low=32, n_high=64, tol=1e-10, max_depth=20)
+print("Integral result:", res)
+print("True value     :", 1.0/3.0)
+print("Abs error      :", abs(res - 1.0/3.0))
+
+```
 
 
 
