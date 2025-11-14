@@ -129,8 +129,25 @@ print(f"Integral result: {result}")
 ---
 ## Adaptive Gaussian Quadrature
 
-### Core idea
+#### 1. Core Idea
+
 Automatically subdivide the integration interval where the integrand changes rapidly, so we spend more samples only where needed to achieve a target accuracy.
+
+
+#### 2. Key mechanism
+
+On a subinterval $[a, b]$, compute two embedded quadrature estimates: a higher-order estimate and a lower-order estimate.
+Use their difference as a local error estimate.
+If the error is within tolerance, accept the higher-order result; otherwise, split $[a, b]$ into two halves and recurse.
+
+#### 3. Practical choice
+
+Use Gauss–Kronrod embedded pairs (e.g., 7/15, 10/21, 15/31). They augment a Gauss rule with extra Kronrod nodes to produce a higher-order estimate and an error estimate without many redundant function evaluations.
+
+#### 4. Stopping criteria
+
+Local error $\le$ tolerance (absolute and/or relative).
+Reaching a maximum recursion depth or a minimum interval size (to avoid infinite subdivision).
 
 
 
