@@ -98,7 +98,7 @@ For various values of \(n\), the nodes and weights can be computed numerically o
 
 ---
 
-### Example 1 Code
+### Example 1
 
 Below is an example implementation of Gaussian quadrature in Python:
 
@@ -146,7 +146,7 @@ Local error $\le$ tolerance (absolute and/or relative).
 Reaching a maximum recursion depth or a minimum interval size (to avoid infinite subdivision).
 
 
-### Example 2 Code
+### Example 2
 
 Below is an example implementation of adaptive Gaussian quadrature in Python:
 
