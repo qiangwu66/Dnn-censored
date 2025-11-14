@@ -121,7 +121,7 @@ def gaussian_quadrature(func, a, b, n):
 result = gaussian_quadrature(lambda x: x**2, 0, 1, 3)
 print(f"Integral result: {result}")
 
-
+```
 
 
 
