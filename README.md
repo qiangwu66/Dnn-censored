@@ -135,7 +135,7 @@ Automatically subdivide the integration interval where the integrand changes rap
 
 #### 2. Key Mechanism
 
-On a subinterval $[a, b]$, compute two embedded quadrature estimates: a higher-order estimate and a lower-order estimate.
+On a subinterval $[a, b]$, compute two Gaussian quadrature estimates: a higher-order estimate and a lower-order estimate.
 Use their difference as a local error estimate.
 If the error is within tolerance, accept the higher-order result; otherwise, split $[a, b]$ into two halves and recurse.
 
