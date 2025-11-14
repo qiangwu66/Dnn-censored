@@ -125,7 +125,7 @@ print(f"Integral result: {result}")
 
 
 
-
+---
 
 ## Adaptive Gaussian Quadrature
 
