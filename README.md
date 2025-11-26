@@ -2,7 +2,7 @@
 
 The simulations includes the finite sample performance of the proposed estimation procedure, the one-sample test, the two-sample test, and the goodness-of-fit test. The real data is about the Study to Understand Prognoses and Preferences for Outcomes and Risks of Treatment (SUPPORT), which is publicly available at https://biostat.app.vumc.org/wiki/Main/DataSets.
 
-## Reference to download and install (Python 3.12.8)
+## Reference to download and install (Python 3.12)
 
 + pip install packages
 
