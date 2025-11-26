@@ -1,6 +1,7 @@
 # Inference for Censored Data with DNN
 
-The simulations includes the finite sample performance of the proposed estimation procedure, the one-sample test, the two-sample test, and the goodness-of-fit test. The real data is about the Study to Understand Prognoses and Preferences for Outcomes and Risks of Treatment (SUPPORT), which is publicly available at https://biostat.app.vumc.org/wiki/Main/DataSets.
+The simulations includes the finite sample performance of the proposed estimation procedure, the one-sample test, the two-sample test, and the goodness-of-fit test. We conducted three real-world data analyses. The first  is about the Study to Understand Prognoses and Preferences for Outcomes and Risks of Treatment (SUPPORT), which is publicly available at https://biostat.app.vumc.org/wiki/Main/DataSets. The second drew on data from TCGA, accessible via https://github.com/PathologyDataScience/SCNN. the Breast Cancer Gene Expression Profiles
+(METABRIC) dataset, available at https://www.kaggle.com/datasets/raghadalharbi/breastcancer-gene-expression-profiles-metabric.
 
 ## Reference to download and install (Python 3.12)
 
@@ -191,6 +192,7 @@ res = adaptive_gaussian_quadrature(f, 0.0, 1.0, n_low=32, n_high=64, tol=1e-10, 
 print("Integral result:", res)
 
 ```
+
 
 
 
