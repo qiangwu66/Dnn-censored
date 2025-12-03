@@ -1,0 +1,159 @@
+
+# python 3.12.8
+#%% ----------------------
+import numpy as np
+import random
+import torch
+from Survival_methods.DNN_iteration_g1 import g1_dnn
+from Survival_methods.DNN_iteration_non import Estimates_non_DNN
+import pandas as pd
+import os
+from scipy.stats import norm
+
+
+#%% ----------------------
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)  
+    torch.manual_seed(seed)   
+
+set_seed(10)
+
+#%% Data Processing
+df = pd.read_csv('METABRIC_RNA.csv') # read csv file
+
+De = np.array(df['overall_survival'], dtype='float32')
+Time = np.array(df['overall_survival_months'], dtype='float32')
+Time = Time / np.max(Time)
+
+
+cols = df.columns[11:]
+sub = df[cols]
+
+col_min = sub.min(axis=0)
+col_max = sub.max(axis=0)
+denom = col_max - col_min
+denom = denom.replace(0, 1e-12)   # 防止分母为0（整列相等）
+
+df[cols] = (sub - col_min) / denom
+
+X_variables = df.iloc[:, 2:].to_numpy()
+
+X = X_variables.astype('float32')
+# random order
+A = np.arange(len(Time))
+np.random.shuffle(A)
+X_R = X[A]
+De_R = De[A]
+Time_R = Time[A]
+
+# -------training data1: 40%  validation data1: 10%  training data2: 40%-----------------------
+# ---training data1: 762
+X_R_train1 = X_R[np.arange(762)]
+De_R_train1 = De_R[np.arange(762)]
+Time_R_train1 = Time_R[np.arange(762)]
+# ---training data2: 762
+X_R_train2 = X_R[np.arange(762, 1524)]
+De_R_train2 = De_R[np.arange(762, 1524)]
+Time_R_train2 = Time_R[np.arange(762, 1524)]
+# ---validation data1: 190
+X_R_valid1 = X_R[np.arange(1524, 1714)]
+De_R_valid1 = De_R[np.arange(1524, 1714)]
+Time_R_valid1 = Time_R[np.arange(1524, 1714)]
+# ---validation data2: 190
+X_R_valid2 = X_R[np.arange(1714, 1904)]
+De_R_valid2 = De_R[np.arange(1714, 1904)]
+Time_R_valid2 = Time_R[np.arange(1714, 1904)]
+
+
+
+#----------------------------------------------------------
+tau = 1
+Dnn_layer1 = 2
+Dnn_node1 = 40
+Dnn_lr1 = 5e-4
+
+Dnn_layer2 = 2
+Dnn_node2 = 40
+Dnn_lr2 = 5e-4
+
+Dnn_epoch = 1000
+patiences = 10
+m = 3
+nodevec= np.array(np.linspace(0, tau, m + 2), dtype="float32")
+t_nodes = np.array(np.linspace(0, tau, 101), dtype="float32")
+
+#--------------------------------------------------------
+def Indicator_matrix(a, b):
+    a = np.array(a)
+    b = np.array(b)
+    I_M = (a[:, np.newaxis] >= b).astype(int)
+    return I_M
+
+def check_matrix_or_vector(value):
+    if isinstance(value, np.ndarray):
+        if value.ndim == 2 or (value.ndim == 1 and value.size > 1):
+            return True
+    return False
+
+
+train_data1 = {
+        'X': X_R_train1,
+        'De': De_R_train1,
+        'T_O': Time_R_train1
+        }
+
+train_data2 = {
+        'X': X_R_train2,
+        'De': De_R_train2,
+        'T_O': Time_R_train2
+        }
+
+val_data1 = {
+        'X': X_R_valid1,
+        'De': De_R_valid1,
+        'T_O': Time_R_valid1
+        }
+
+val_data2 = {
+        'X': X_R_valid2,
+        'De': De_R_valid2,
+        'T_O': Time_R_valid2
+        }
+
+polled_data = {
+    key: np.concatenate((train_data1[key], train_data2[key]), axis=0) if train_data1[key].ndim > 1 else np.concatenate((train_data1[key], train_data2[key]))
+    for key in train_data1
+}
+
+# ----------------dnn----------------
+Est_dnn_g1 = g1_dnn(polled_data, train_data1,val_data1, tau, Dnn_layer1, Dnn_node1, Dnn_lr1, Dnn_epoch, patiences)
+
+g1_T_X_n = Est_dnn_g1['g1_T_X_n']
+sigma_1_n1 = Est_dnn_g1['sigma_1_n1']
+
+# ----------------DNN_non--------------
+Est_dnn_non_g0 = Estimates_non_DNN(polled_data, train_data2, val_data2, t_nodes, m, nodevec, tau, Dnn_layer2, Dnn_node2, Dnn_lr2, Dnn_epoch, patiences)
+    
+sigma_1_n2_noncoxph = Est_dnn_non_g0['sigma_1_n2_noncoxph']
+g0_T_X_n_non = Est_dnn_non_g0['g0_T_X_n_non']
+
+#%%-----------Test Statistics-------------
+sigma_n1 = np.sqrt(2 * (sigma_1_n1 ** 2 + sigma_1_n2_noncoxph ** 2))
+I_T_T_n = Indicator_matrix(polled_data['T_O'], polled_data['T_O']) 
+I_T_T_mean = np.mean(I_T_T_n, axis=0) 
+T_w_n = np.sqrt(1524) * np.mean(polled_data['De'] * I_T_T_mean * (g1_T_X_n - g0_T_X_n_non))
+T_sigma_n1 = T_w_n / sigma_n1
+
+p_value = 2 * (1 - norm.cdf(abs(T_sigma_n1)))
+
+# =================tables=======================
+output_folder = "Results_p_values"
+os.makedirs(output_folder, exist_ok=True)
+
+result_size_DNN = pd.DataFrame(
+    np.array([p_value])
+    ) 
+size_DNN_path = os.path.join(output_folder, f"Coxnonlinear_p_value.csv")
+result_size_DNN.to_csv(size_DNN_path, index=False, header=False) 
+
